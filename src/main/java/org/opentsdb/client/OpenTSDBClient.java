@@ -1,10 +1,9 @@
 package org.opentsdb.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.opentsdb.client.bean.request.Api;
 import org.opentsdb.client.bean.request.Query;
 import org.opentsdb.client.bean.response.QueryResult;
 import org.opentsdb.client.http.HttpClient;
@@ -47,14 +46,10 @@ public class OpenTSDBClient {
      * @return
      */
     public List<QueryResult> query(Query query) throws IOException, ExecutionException, InterruptedException {
-        ObjectMapper mapper = Json.getInstance();
-        HttpResponse response = httpClient.post("/api/query", mapper.writeValueAsString(query));
-        CollectionType collectionType = mapper.getTypeFactory()
-                                              .constructCollectionType(List.class, QueryResult.class);
-        List<QueryResult> results = mapper.readValue(ResponseUtil.getContent(response), collectionType);
+        HttpResponse response = httpClient.post(Api.QUERY.getPath(), Json.writeValueAsString(query));
+        List<QueryResult> results = Json.readValue(ResponseUtil.getContent(response), List.class, QueryResult.class);
         return results;
     }
-
 
 
 }

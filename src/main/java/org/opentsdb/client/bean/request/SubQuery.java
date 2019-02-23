@@ -3,6 +3,7 @@ package org.opentsdb.client.bean.request;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Maps;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -126,6 +127,13 @@ public class SubQuery {
 
         public Builder filter(Filter filter) {
             filters.add(filter);
+            return this;
+        }
+
+        public Builder filter(List<Filter> filterList) {
+            if (!CollectionUtils.isEmpty(filterList)) {
+                filters.addAll(filterList);
+            }
             return this;
         }
 

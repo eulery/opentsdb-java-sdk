@@ -45,7 +45,7 @@ public class HttpClientFactory {
         ConnectingIOReactor ioReactor = initIOReactorConfig();
         PoolingNHttpClientConnectionManager connManager = new PoolingNHttpClientConnectionManager(ioReactor);
 
-        RequestConfig requestConfig = initRequestConfig();
+        RequestConfig requestConfig = initRequestConfig(config);
         CloseableHttpAsyncClient httpAsyncClient = createPoolingHttpClient(requestConfig, connManager);
 
         return new HttpClient(config, httpAsyncClient, initFixedCycleCloseConnection(connManager));
@@ -70,11 +70,14 @@ public class HttpClientFactory {
      * 设置超时时间
      * @return
      */
-    private static RequestConfig initRequestConfig() {
+    private static RequestConfig initRequestConfig(OpenTSDBConfig config) {
         return RequestConfig.custom()
-                            .setConnectTimeout(50000)
-                            .setSocketTimeout(50000)
-                            .setConnectionRequestTimeout(1000)
+                            // ConnectTimeout:连接超时.连接建立时间，三次握手完成时间.
+                            .setConnectTimeout(config.getHttpConnectTimeout() * 1000)
+                            // SocketTimeout:Socket请求超时.数据传输过程中数据包之间间隔的最大时间.
+                            .setSocketTimeout(config.getHttpConnectTimeout() * 1000)
+                            // ConnectionRequestTimeout:httpclient使用连接池来管理连接，这个时间就是从连接池获取连接的超时时间
+                            .setConnectionRequestTimeout(config.getHttpConnectTimeout() * 1000)
                             .build();
     }
 

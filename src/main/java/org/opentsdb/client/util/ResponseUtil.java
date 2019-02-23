@@ -1,6 +1,5 @@
 package org.opentsdb.client.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -62,8 +61,7 @@ public class ResponseUtil {
      * @return
      */
     private static ErrorResponse convert(HttpResponse response) throws IOException {
-        ObjectMapper mapper = Json.getInstance();
-        return mapper.readValue(getContent(response), ErrorResponse.class);
+        return Json.readValue(getContent(response), ErrorResponse.class);
     }
 
 

@@ -59,11 +59,13 @@ public class CurdTest {
      * 并发查询测试
      * 测试结果大概190个线程会出现http超时
      * 之后会把http超时做成参数
+     *
+     * 更新：已解决这个问题，目前默认超时时间100秒，并可以通过参数改变
      */
     @Test
     public void testQueryConcurrent() {
         CountDownLatch latch = new CountDownLatch(1);
-        int threadCount = 185;
+        int threadCount = 2000;
         long[] times = new long[3];
         // 利用CyclicBarrier模拟并发
         CyclicBarrier startBarrier = new CyclicBarrier(

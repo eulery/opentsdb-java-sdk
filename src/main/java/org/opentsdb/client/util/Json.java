@@ -2,17 +2,20 @@ package org.opentsdb.client.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 
 /**
- *
- * 配置一个通用的jackson objectmapper
+ * 配置一个单例的jackson objectMapper，同时防止外部修改mapper的配置
  *
  * @ProjectName: javaclient
  * @Package: org.opentsdb.client
@@ -51,8 +54,39 @@ public class Json {
 
     }
 
-    public static ObjectMapper getInstance(){
-        return instance;
+    /***
+     * 将对象序列化为json字符串
+     * @param value
+     * @return
+     * @throws JsonProcessingException
+     */
+    public static String writeValueAsString(Object value) throws JsonProcessingException {
+        return instance.writeValueAsString(value);
+    }
+
+    /***
+     * 将json字符串反序列化为T类型的对象
+     * @param content
+     * @param valueType
+     * @param <T>
+     * @return
+     * @throws IOException
+     */
+    public static <T> T readValue(String content, Class<T> valueType) throws IOException {
+        return instance.readValue(content, valueType);
+    }
+
+    /***
+     * 将json反序列化为集合，集合类型是collectionClass，泛型是elementClass
+     * @param content
+     * @param collectionClass 集合类型
+     * @param elementClass  泛型
+     */
+    public static <T> T readValue(String content, Class<? extends Collection> collectionClass,
+                                   Class<?> elementClass) throws IOException {
+        CollectionType collectionType = instance.getTypeFactory()
+                                                .constructCollectionType(collectionClass, elementClass);
+        return instance.readValue(content, collectionType);
     }
 
 }

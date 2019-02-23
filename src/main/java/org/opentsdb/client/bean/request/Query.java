@@ -100,7 +100,7 @@ public class Query {
                 throw new IllegalArgumentException("the start time must be set");
             }
 
-            if(CollectionUtils.isEmpty(queries)){
+            if (CollectionUtils.isEmpty(queries)) {
                 throw new IllegalArgumentException("the subQueries must be set");
             }
             query.queries = this.queries;
@@ -202,6 +202,13 @@ public class Query {
 
         public Builder sub(SubQuery subQuery) {
             queries.add(subQuery);
+            return this;
+        }
+
+        public Builder sub(List<SubQuery> subQueryList) {
+            if (!CollectionUtils.isEmpty(subQueryList)) {
+                queries.addAll(subQueryList);
+            }
             return this;
         }
 

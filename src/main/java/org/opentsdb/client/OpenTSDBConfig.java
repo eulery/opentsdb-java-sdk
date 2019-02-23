@@ -1,5 +1,7 @@
 package org.opentsdb.client;
 
+import lombok.Data;
+
 /**
  * @ProjectName: javaclient
  * @Package: org.opentsdb.client
@@ -11,17 +13,26 @@ package org.opentsdb.client;
  * @UpdateRemark: The modified content
  * @Version: 1.0
  */
+@Data
 public class OpenTSDBConfig {
 
     private String host;
 
     private int port;
 
+    private int httpConnectionPool = 100; // 每个Host分配的连接数
+
+    private int httpConnectTimeout = 100; // 单位：秒
+
     public static class Builder {
 
         private String host;
 
         private int port;
+
+        private int httpConnectionPool = 100;
+
+        private int httpConnectTimeout = 100;
 
         public Builder(String host, int port) {
             this.host = host;
@@ -37,25 +48,26 @@ public class OpenTSDBConfig {
             return config;
         }
 
+        public Builder httpConnectionPool(int connectionPool) {
+            if (connectionPool <= 0) {
+                throw new IllegalArgumentException("The ConnectionPool con't be less then 1");
+            }
+            httpConnectionPool = connectionPool;
+            return this;
+        }
+
+        public Builder httpConnectTimeout(int httpConnectTimeout) {
+            if (httpConnectTimeout <= 0) {
+                throw new IllegalArgumentException("The connectTimtout con't be less then 0");
+            }
+            this.httpConnectTimeout = httpConnectTimeout;
+            return this;
+        }
+
     }
 
     public static Builder address(String host, int port) {
         return new Builder(host, port);
     }
 
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
 }
