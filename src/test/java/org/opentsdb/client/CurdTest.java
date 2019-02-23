@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.junit.Before;
 import org.junit.Test;
+import org.opentsdb.client.bean.request.Point;
 import org.opentsdb.client.bean.request.Query;
 import org.opentsdb.client.bean.request.SubQuery;
 import org.opentsdb.client.bean.response.QueryResult;
@@ -42,7 +43,7 @@ public class CurdTest {
         log.debug("当前线程:{}", Thread.currentThread()
                                    .getName());
         Query query = Query.begin("7d-ago")
-                           .sub(SubQuery.metric("sys.cpu.nice")
+                           .sub(SubQuery.metric("metric.test")
                                         .aggregator(SubQuery.Aggregator.NONE)
                                         .build())
                            .build();
@@ -109,6 +110,18 @@ public class CurdTest {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * 测试写入数据
+     */
+    @Test
+    public void put() throws Exception{
+        Point point = Point.metric("metric.test")
+                           .tag("test", "hello")
+                           .value(System.currentTimeMillis(), 1.0)
+                           .build();
+        client.put(point);
     }
 
 }

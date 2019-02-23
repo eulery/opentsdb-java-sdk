@@ -83,7 +83,7 @@ public class HttpClient {
         }
 
         Future<HttpResponse> future = client.execute(httpPost, responseCallback);
-        HttpResponse httpResponse = null;
+        HttpResponse httpResponse;
         try {
             httpResponse = future.get();
         } finally {

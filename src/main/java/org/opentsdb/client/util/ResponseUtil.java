@@ -5,6 +5,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.util.EntityUtils;
 import org.opentsdb.client.bean.response.ErrorResponse;
+import org.opentsdb.client.common.Json;
 import org.opentsdb.client.exception.http.HttpException;
 
 import java.io.IOException;
@@ -30,10 +31,13 @@ public class ResponseUtil {
         if (checkGT400(response)) {
             throw new HttpException(convert(response));
         } else {
-            HttpEntity entity = response.getEntity();
-            String content = EntityUtils.toString(entity, Charset.defaultCharset());
-            return content;
+            return getContentString(response);
         }
+    }
+
+    private static String getContentString(HttpResponse response) throws IOException {
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, Charset.defaultCharset());
     }
 
     /***
@@ -56,7 +60,7 @@ public class ResponseUtil {
      * @return
      */
     private static ErrorResponse convert(HttpResponse response) throws IOException {
-        return Json.readValue(getContent(response), ErrorResponse.class);
+        return Json.readValue(getContentString(response), ErrorResponse.class);
     }
 
 

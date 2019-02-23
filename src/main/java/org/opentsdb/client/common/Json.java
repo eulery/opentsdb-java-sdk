@@ -1,4 +1,4 @@
-package org.opentsdb.client.util;
+package org.opentsdb.client.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;

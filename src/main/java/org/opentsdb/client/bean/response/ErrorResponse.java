@@ -18,7 +18,7 @@ public class ErrorResponse {
     @Data
     public static class Error{
 
-        private int status;
+        private int code;
 
         private String message;
 
