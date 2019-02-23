@@ -1,13 +1,12 @@
 package org.opentsdb.client.sender.consumer;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
 import org.opentsdb.client.OpenTSDBConfig;
 import org.opentsdb.client.bean.request.Api;
 import org.opentsdb.client.bean.request.Point;
 import org.opentsdb.client.common.Json;
 import org.opentsdb.client.http.HttpClient;
-import org.opentsdb.client.util.ResponseUtil;
+import org.opentsdb.client.http.callback.BatchPutHttpResponseCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,10 +118,8 @@ public class ConsumerRunnable implements Runnable {
      */
     private void sendHttp(List<Point> points) {
         try {
-            HttpResponse response = httpClient.post(Api.PUT.getPath(), Json.writeValueAsString(points));
-            ResponseUtil.getContent(response);
+            httpClient.post(Api.PUT.getPath(), Json.writeValueAsString(points), new BatchPutHttpResponseCallback());
         } catch (Exception e) {
-            log.error("", e);
             e.printStackTrace();
         }
     }

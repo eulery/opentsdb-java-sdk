@@ -1,7 +1,10 @@
 package org.opentsdb.client.http;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.ConnectionReuseStrategy;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
@@ -9,6 +12,7 @@ import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.http.protocol.HttpContext;
 import org.opentsdb.client.OpenTSDBConfig;
 
 import java.util.Objects;
@@ -90,6 +94,7 @@ public class HttpClientFactory {
         CloseableHttpAsyncClient client = HttpAsyncClients.custom()
                                                           .setConnectionManager(cm)
                                                           .setDefaultRequestConfig(config)
+                                                          .setConnectionReuseStrategy(new OpenTSDBConnectionReuseStrategy())
                                                           .build();
         return client;
     }
@@ -124,6 +129,31 @@ public class HttpClientFactory {
             }
         }, 30, 30, TimeUnit.SECONDS);
         return connectionGcService;
+    }
+
+    public static class OpenTSDBConnectionKeepAliveStrategy implements ConnectionKeepAliveStrategy {
+
+        private long time;
+
+        public OpenTSDBConnectionKeepAliveStrategy(long time) {
+            super();
+            this.time = time;
+        }
+
+        @Override
+        public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
+            return 1000 * time;
+        }
+
+    }
+
+    public static class OpenTSDBConnectionReuseStrategy implements ConnectionReuseStrategy {
+
+        @Override
+        public boolean keepAlive(HttpResponse response, HttpContext context) {
+            return false;
+        }
+
     }
 
 }

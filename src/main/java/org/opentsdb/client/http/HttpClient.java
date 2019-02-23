@@ -8,9 +8,10 @@ import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.opentsdb.client.OpenTSDBConfig;
+import org.opentsdb.client.http.callback.CustomFutureCallBack;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -57,7 +58,7 @@ public class HttpClient {
      * @param json
      * @return
      */
-    public HttpResponse post(String path, String json) throws ExecutionException, InterruptedException {
+    public Future<HttpResponse> post(String path, String json) {
         return this.post(path, json, null);
     }
 
@@ -68,7 +69,7 @@ public class HttpClient {
      * @param httpCallback
      * @return
      */
-    public HttpResponse post(String path, String json, FutureCallback<HttpResponse> httpCallback) throws ExecutionException, InterruptedException {
+    public Future<HttpResponse> post(String path, String json, FutureCallback<HttpResponse> httpCallback) {
         log.debug("发送post请求，路径:{}，请求内容:{}", path, json);
         HttpPost httpPost = new HttpPost(getUrl(path));
         if (StringUtils.isNoneBlank(json)) {
@@ -77,21 +78,12 @@ public class HttpClient {
         }
 
         FutureCallback<HttpResponse> responseCallback = null;
-        log.debug("等待完成的任务数:{}", unCompletedTaskNum.incrementAndGet());
         if (httpCallback != null) {
+            log.debug("等待完成的任务数:{}", unCompletedTaskNum.incrementAndGet());
             responseCallback = new CustomFutureCallBack(unCompletedTaskNum, httpCallback);
         }
 
-        Future<HttpResponse> future = client.execute(httpPost, responseCallback);
-        HttpResponse httpResponse;
-        try {
-            httpResponse = future.get();
-        } finally {
-            if (responseCallback == null) {
-                log.debug("等待完成的任务数:{}", unCompletedTaskNum.decrementAndGet());
-            }
-        }
-        return httpResponse;
+        return client.execute(httpPost, responseCallback);
     }
 
     private String getUrl(String path) {
@@ -103,44 +95,43 @@ public class HttpClient {
         return stringEntity;
     }
 
-    /***
-     * 自定义FutureCallBack，用来对任务完成、异常、取消后进行减数
-     */
-    public static class CustomFutureCallBack implements FutureCallback<HttpResponse> {
-
-        private final AtomicInteger unCompletedTaskNum;
-        private final FutureCallback<HttpResponse> futureCallback;
-
-        public CustomFutureCallBack(AtomicInteger unCompletedTaskNum, FutureCallback<HttpResponse> futureCallback) {
-            super();
-            this.unCompletedTaskNum = unCompletedTaskNum;
-            this.futureCallback = futureCallback;
-        }
-
-        @Override
-        public void completed(HttpResponse result) {
-            futureCallback.completed(result);
-            // 任务处理完毕，再减数
-            log.debug("等待完成的任务数:{}", unCompletedTaskNum.decrementAndGet());
-        }
-
-        @Override
-        public void failed(Exception ex) {
-            futureCallback.failed(ex);
-            // 任务处理完毕，再减数
-            log.debug("等待完成的任务数:{}", unCompletedTaskNum.decrementAndGet());
-        }
-
-        @Override
-        public void cancelled() {
-            futureCallback.cancelled();
-            // 任务处理完毕，再减数
-            log.debug("等待完成的任务数:{}", unCompletedTaskNum.decrementAndGet());
-        }
-    }
-
-    public void start(){
+    public void start() {
         this.client.start();
     }
 
+    public void gracefulClose() throws IOException {
+        this.close(false);
+    }
+
+    public void forceClose() throws IOException {
+        this.close(true);
+    }
+
+    private void close(boolean force) throws IOException {
+        // 关闭等待
+        if (!force) {
+            // 优雅关闭
+            while (client.isRunning()) {
+                int i = this.unCompletedTaskNum.get();
+                if (i == 0) {
+                    break;
+                } else {
+                    try {
+                        // 轮询检查优雅关闭
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        log.warn("The thread {} is Interrupted", Thread.currentThread()
+                                                                       .getName());
+                    }
+                }
+            }
+        }
+        connectionGcService.shutdownNow();
+
+        // 关闭
+        client.close();
+    }
+
+
 }
+

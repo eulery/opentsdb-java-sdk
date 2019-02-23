@@ -37,7 +37,10 @@ public class ResponseUtil {
 
     private static String getContentString(HttpResponse response) throws IOException {
         HttpEntity entity = response.getEntity();
-        return EntityUtils.toString(entity, Charset.defaultCharset());
+        if (entity != null) {
+            return EntityUtils.toString(entity, Charset.defaultCharset());
+        }
+        return null;
     }
 
     /***

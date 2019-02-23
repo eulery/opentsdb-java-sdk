@@ -116,12 +116,57 @@ public class CurdTest {
      * 测试写入数据
      */
     @Test
-    public void put() throws Exception{
+    public void put() throws Exception {
         Point point = Point.metric("metric.test")
                            .tag("test", "hello")
                            .value(System.currentTimeMillis(), 1.0)
                            .build();
         client.put(point);
+        client.gracefulClose();
+    }
+
+    /***
+     * 并发写入测试
+     */
+    @Test
+    public void batchPut() throws Exception {
+        /***
+         * 使用5个线程，每个线程都写入10000条数据
+         */
+        int threadCount = 5;
+        int dataCount = 10000;
+        CountDownLatch latch = new CountDownLatch(5);
+        int[] ints = new int[1];
+        ExecutorService threadPool = Executors.newFixedThreadPool(5, (r) ->
+                new Thread(r, String.valueOf(++ints[0]))
+        );
+        long start = System.currentTimeMillis();
+
+        /**
+         * 前一天
+         */
+        long begin = start - (long)24 * 60 * 60 *1000;
+        for (int a = 0; a < threadCount; a++) {
+            threadPool.execute(() -> {
+                for (int i = 0; i < dataCount; i++) {
+                    Point point = Point.metric("metric.test" + Thread.currentThread()
+                                                                     .getName())
+                                       .tag("test", "hello")
+                                       /**
+                                        * 每秒一条数据
+                                        */
+                                       .value(begin + i * 1000, i)
+                                       .build();
+                    client.put(point);
+                }
+                latch.countDown();
+            });
+        }
+
+        latch.await();
+        long end = System.currentTimeMillis();
+        log.debug("运行时间:{}毫秒", end - start);
+        client.gracefulClose();
     }
 
 }

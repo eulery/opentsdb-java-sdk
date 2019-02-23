@@ -18,9 +18,7 @@ import org.opentsdb.client.util.ResponseUtil;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.*;
 
 /**
  * @Description: opentsdb客户端
@@ -39,13 +37,15 @@ public class OpenTSDBClient {
 
     private Consumer consumer;
 
+    private BlockingQueue<Point> queue;
+
     public OpenTSDBClient(OpenTSDBConfig config) throws IOReactorException {
         this.config = config;
         this.httpClient = HttpClientFactory.createHttpClient(config);
         this.httpClient.start();
 
-        if(!config.isReadonly()){
-            BlockingQueue<Point> queue = new ArrayBlockingQueue<>(config.getBatchPutBufferSize());
+        if (!config.isReadonly()) {
+            this.queue = new ArrayBlockingQueue<>(config.getBatchPutBufferSize());
             this.producer = new ProducerImpl(queue);
             this.consumer = new ConsumerImpl(queue, httpClient, config);
             this.consumer.start();
@@ -60,7 +60,8 @@ public class OpenTSDBClient {
      * @return
      */
     public List<QueryResult> query(Query query) throws IOException, ExecutionException, InterruptedException {
-        HttpResponse response = httpClient.post(Api.QUERY.getPath(), Json.writeValueAsString(query));
+        Future<HttpResponse> future = httpClient.post(Api.QUERY.getPath(), Json.writeValueAsString(query));
+        HttpResponse response = future.get();
         List<QueryResult> results = Json.readValue(ResponseUtil.getContent(response), List.class, QueryResult.class);
         return results;
     }
@@ -71,6 +72,44 @@ public class OpenTSDBClient {
      */
     public void put(Point point) {
         producer.send(point);
+    }
+
+    /***
+     * 优雅关闭链接，会等待所有消费者线程结束
+     */
+    public void gracefulClose() throws IOException {
+        if (!config.isReadonly()) {
+            // 先停止写入
+            this.producer.forbiddenSend();
+            // 等待队列被消费空
+            this.waitEmpty();
+            // 关闭消费者
+            this.consumer.gracefulStop();
+        }
+        this.httpClient.gracefulClose();
+    }
+
+    /***
+     * 等待队列被消费空
+     */
+    private void waitEmpty() {
+        while (!queue.isEmpty()) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(config.getBatchPutTimeLimit());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /***
+     * 强行关闭
+     */
+    public void forceClose() throws IOException {
+        if (!config.isReadonly()) {
+            this.consumer.forceStop();
+        }
+        this.httpClient.forceClose();
     }
 
 }

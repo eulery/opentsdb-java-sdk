@@ -54,7 +54,7 @@ public class ConsumerImpl implements Consumer {
     }
 
     @Override
-    public void stop() {
+    public void gracefulStop() {
         this.stop(false);
     }
 

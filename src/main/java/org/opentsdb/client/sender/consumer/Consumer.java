@@ -18,7 +18,7 @@ public interface Consumer {
     /***
      * 停止消费，会等待线程池中的任务完成
      */
-    void stop();
+    void gracefulStop();
 
     /***
      * 强制停止
