@@ -16,14 +16,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @ProjectName: javaclient
- * @Package: org.opentsdb.client.http
  * @Description:
  * @Author: jinyao
  * @CreateDate: 2019/2/22 下午1:29
- * @UpdateUser: jinyao
- * @UpdateDate: 2019/2/22 下午1:29
- * @UpdateRemark: The modified content
  * @Version: 1.0
  */
 @Slf4j

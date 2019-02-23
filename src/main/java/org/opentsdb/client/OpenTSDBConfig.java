@@ -3,14 +3,9 @@ package org.opentsdb.client;
 import lombok.Data;
 
 /**
- * @ProjectName: javaclient
- * @Package: org.opentsdb.client
  * @Description: opentsdb通用配置
  * @Author: jinyao
  * @CreateDate: 2019/2/21 下午9:06
- * @UpdateUser: jinyao
- * @UpdateDate: 2019/2/21 下午9:06
- * @UpdateRemark: The modified content
  * @Version: 1.0
  */
 @Data

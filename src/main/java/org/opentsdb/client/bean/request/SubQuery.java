@@ -12,14 +12,9 @@ import java.util.*;
 /**
  * 子查询，详见<a>http://opentsdb.net/docs/build/html/api_http/query/index.html</a>
  *
- * @ProjectName: javaclient
- * @Package: org.opentsdb.client.bean.request
  * @Description:
  * @Author: jinyao
  * @CreateDate: 2019/2/21 下午10:37
- * @UpdateUser: jinyao
- * @UpdateDate: 2019/2/21 下午10:37
- * @UpdateRemark: The modified content
  * @Version: 1.0
  */
 @Data

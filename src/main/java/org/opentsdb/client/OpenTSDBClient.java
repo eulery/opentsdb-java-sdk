@@ -16,14 +16,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * @ProjectName: javaclient
- * @Package: org.opentsdb.client
  * @Description: opentsdb客户端
  * @Author: jinyao
  * @CreateDate: 2019/2/21 下午9:16
- * @UpdateUser: jinyao
- * @UpdateDate: 2019/2/21 下午9:16
- * @UpdateRemark: The modified content
  * @Version: 1.0
  */
 @Slf4j

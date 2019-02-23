@@ -13,14 +13,9 @@ import java.nio.charset.Charset;
 /**
  * 响应解析工具类
  *
- * @ProjectName: javaclient
- * @Package: org.opentsdb.client.util
  * @Description:
  * @Author: jinyao
  * @CreateDate: 2019/2/22 下午7:30
- * @UpdateUser: jinyao
- * @UpdateDate: 2019/2/22 下午7:30
- * @UpdateRemark: The modified content
  * @Version: 1.0
  */
 public class ResponseUtil {

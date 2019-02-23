@@ -7,14 +7,9 @@ import java.text.MessageFormat;
 import java.util.Objects;
 
 /**
- * @ProjectName: javaclient
- * @Package: org.opentsdb.client.exception.http
  * @Description:
  * @Author: jinyao
  * @CreateDate: 2019/2/22 下午7:40
- * @UpdateUser: jinyao
- * @UpdateDate: 2019/2/22 下午7:40
- * @UpdateRemark: The modified content
  * @Version: 1.0
  */
 @Data

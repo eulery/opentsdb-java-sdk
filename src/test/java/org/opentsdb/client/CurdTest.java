@@ -13,14 +13,9 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * @ProjectName: javaclient
- * @Package: org.opentsdb.client
  * @Description:
  * @Author: jinyao
  * @CreateDate: 2019/2/22 下午3:53
- * @UpdateUser: jinyao
- * @UpdateDate: 2019/2/22 下午3:53
- * @UpdateRemark: The modified content
  * @Version: 1.0
  */
 @Slf4j

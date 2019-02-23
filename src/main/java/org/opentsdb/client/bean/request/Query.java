@@ -10,14 +10,9 @@ import java.util.List;
 /**
  * 详见<a>http://opentsdb.net/docs/build/html/api_http/query/index.html</a>
  *
- * @ProjectName: javaclient
- * @Package: org.opentsdb.client.bean.request
  * @Description:
  * @Author: jinyao
  * @CreateDate: 2019/2/21 下午9:45
- * @UpdateUser: jinyao
- * @UpdateDate: 2019/2/21 下午9:45
- * @UpdateRemark: The modified content
  * @Version: 1.0
  */
 @Data

@@ -17,14 +17,9 @@ import java.util.Collection;
 /**
  * 配置一个单例的jackson objectMapper，同时防止外部修改mapper的配置
  *
- * @ProjectName: javaclient
- * @Package: org.opentsdb.client
  * @Description:
  * @Author: jinyao
  * @CreateDate: 2019/2/22 下午1:21
- * @UpdateUser: jinyao
- * @UpdateDate: 2019/2/22 下午1:21
- * @UpdateRemark: The modified content
  * @Version: 1.0
  */
 public class Json {
