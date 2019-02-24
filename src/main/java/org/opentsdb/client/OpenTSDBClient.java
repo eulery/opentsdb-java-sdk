@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.opentsdb.client.bean.request.Api;
+import org.opentsdb.client.bean.request.LastPointQuery;
 import org.opentsdb.client.bean.request.Point;
 import org.opentsdb.client.bean.request.Query;
+import org.opentsdb.client.bean.response.LastPointQueryResult;
 import org.opentsdb.client.bean.response.QueryResult;
 import org.opentsdb.client.common.Json;
 import org.opentsdb.client.http.HttpClient;
@@ -67,11 +69,31 @@ public class OpenTSDBClient {
     }
 
     /***
+     * 查询最新的数据
+     * @param query
+     * @return
+     */
+    public List<LastPointQueryResult> queryLast(LastPointQuery query) throws IOException, ExecutionException, InterruptedException {
+        Future<HttpResponse> future = httpClient.post(Api.LAST.getPath(), Json.writeValueAsString(query));
+        HttpResponse response = future.get();
+        List<LastPointQueryResult> results = Json.readValue(ResponseUtil.getContent(response), List.class, LastPointQueryResult.class);
+        return results;
+    }
+
+    /***
      * 写入数据
      * @param point
      */
     public void put(Point point) {
         producer.send(point);
+    }
+
+    /***
+     * 删除数据
+     * @param query
+     */
+    public void deleteData(Query query) {
+
     }
 
     /***

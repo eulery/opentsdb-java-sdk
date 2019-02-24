@@ -86,6 +86,8 @@ public class HttpClient {
         return client.execute(httpPost, responseCallback);
     }
 
+
+
     private String getUrl(String path) {
         return host + ":" + port + path;
     }

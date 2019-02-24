@@ -14,7 +14,8 @@ public enum Api {
      * path对应api地址
      */
     PUT("/api/put"),
-    QUERY("/api/query");
+    QUERY("/api/query"),
+    LAST("/api/query/last");
 
     private String path;
 

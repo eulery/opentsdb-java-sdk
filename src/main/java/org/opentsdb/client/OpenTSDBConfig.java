@@ -139,8 +139,8 @@ public class OpenTSDBConfig {
             return this;
         }
 
-        public Builder readonly(boolean readonly) {
-            this.readonly = readonly;
+        public Builder readonly() {
+            this.readonly = true;
             return this;
         }
 

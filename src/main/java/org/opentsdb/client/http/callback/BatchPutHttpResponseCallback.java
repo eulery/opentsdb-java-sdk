@@ -5,7 +5,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.concurrent.FutureCallback;
 
 /**
- * 实现put成功后的回调
+ * 实现put后的回调
  *
  * @Author: jinyao
  * @Description:
