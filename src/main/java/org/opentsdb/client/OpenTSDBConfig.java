@@ -1,6 +1,7 @@
 package org.opentsdb.client;
 
 import lombok.Data;
+import org.opentsdb.client.http.callback.BatchPutHttpResponseCallback;
 
 /**
  * @Description: opentsdb通用配置
@@ -28,6 +29,8 @@ public class OpenTSDBConfig {
     private int batchPutTimeLimit;
 
     private boolean readonly;
+
+    private BatchPutHttpResponseCallback.BatchPutCallBack batchPutCallBack;
 
     public static class Builder {
 
@@ -70,6 +73,11 @@ public class OpenTSDBConfig {
          */
         private boolean readonly = false;
 
+        /***
+         * 对这个client实例的批量写入设置一个回调接口
+         */
+        private BatchPutHttpResponseCallback.BatchPutCallBack batchPutCallBack;
+
         public Builder(String host, int port) {
             this.host = host;
             this.port = port;
@@ -87,6 +95,7 @@ public class OpenTSDBConfig {
             config.batchPutBufferSize = this.batchPutBufferSize;
             config.batchPutTimeLimit = this.batchPutTimeLimit;
             config.readonly = this.readonly;
+            config.batchPutCallBack = this.batchPutCallBack;
 
             return config;
         }
@@ -141,6 +150,11 @@ public class OpenTSDBConfig {
 
         public Builder readonly() {
             this.readonly = true;
+            return this;
+        }
+
+        public Builder batchPutCallBack(BatchPutHttpResponseCallback.BatchPutCallBack batchPutCallBack){
+            this.batchPutCallBack = batchPutCallBack;
             return this;
         }
 

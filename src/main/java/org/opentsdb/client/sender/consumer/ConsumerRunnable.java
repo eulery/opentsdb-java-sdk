@@ -33,6 +33,8 @@ public class ConsumerRunnable implements Runnable {
 
     private final CountDownLatch countDownLatch;
 
+    private BatchPutHttpResponseCallback.BatchPutCallBack callBack;
+
     /**
      * 每批次数据点个数
      */
@@ -50,7 +52,9 @@ public class ConsumerRunnable implements Runnable {
         this.countDownLatch = countDownLatch;
         this.batchSize = config.getBatchPutSize();
         this.batchPutTimeLimit = config.getBatchPutTimeLimit();
+        this.callBack = config.getBatchPutCallBack();
     }
+
 
     /***
      * 设计原则是接收满${batchSize}个元素就提交，或者达到时间${batchPutTimeLimit}
@@ -118,7 +122,19 @@ public class ConsumerRunnable implements Runnable {
      */
     private void sendHttp(List<Point> points) {
         try {
-            httpClient.post(Api.PUT.getPath(), Json.writeValueAsString(points), new BatchPutHttpResponseCallback());
+            if (callBack == null) {
+                httpClient.post(
+                        Api.PUT.getPath(),
+                        Json.writeValueAsString(points),
+                        new BatchPutHttpResponseCallback()
+                );
+            } else {
+                httpClient.post(
+                        Api.PUT_DETAIL.getPath(),
+                        Json.writeValueAsString(points),
+                        new BatchPutHttpResponseCallback(callBack, points)
+                );
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

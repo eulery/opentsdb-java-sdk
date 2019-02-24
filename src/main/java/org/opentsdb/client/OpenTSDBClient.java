@@ -1,5 +1,6 @@
 package org.opentsdb.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.nio.reactor.IOReactorException;
@@ -12,6 +13,7 @@ import org.opentsdb.client.bean.response.QueryResult;
 import org.opentsdb.client.common.Json;
 import org.opentsdb.client.http.HttpClient;
 import org.opentsdb.client.http.HttpClientFactory;
+import org.opentsdb.client.http.callback.QueryHttpResponseCallback;
 import org.opentsdb.client.sender.consumer.Consumer;
 import org.opentsdb.client.sender.consumer.ConsumerImpl;
 import org.opentsdb.client.sender.producer.Producer;
@@ -69,6 +71,16 @@ public class OpenTSDBClient {
     }
 
     /***
+     * 异步查询
+     * @param query
+     * @param callback
+     */
+    public void query(Query query, QueryHttpResponseCallback.QueryCallback callback) throws JsonProcessingException {
+        QueryHttpResponseCallback queryHttpResponseCallback = new QueryHttpResponseCallback(callback, query);
+        httpClient.post(Api.QUERY.getPath(), Json.writeValueAsString(query), queryHttpResponseCallback);
+    }
+
+    /***
      * 查询最新的数据
      * @param query
      * @return
@@ -86,14 +98,6 @@ public class OpenTSDBClient {
      */
     public void put(Point point) {
         producer.send(point);
-    }
-
-    /***
-     * 删除数据
-     * @param query
-     */
-    public void deleteData(Query query) {
-
     }
 
     /***

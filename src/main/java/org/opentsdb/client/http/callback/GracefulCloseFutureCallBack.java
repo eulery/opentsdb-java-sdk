@@ -7,7 +7,7 @@ import org.apache.http.concurrent.FutureCallback;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 自定义FutureCallBack，用来对任务完成、异常、取消后进行减数
+ * 定义一个FutureCallBack，用来对任务完成、异常、取消后进行减数
  *
  * @Author: jinyao
  * @Description:
@@ -15,12 +15,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @Version: 1.0
  */
 @Slf4j
-public class CustomFutureCallBack implements FutureCallback<HttpResponse>{
+public class GracefulCloseFutureCallBack implements FutureCallback<HttpResponse>{
 
     private final AtomicInteger unCompletedTaskNum;
     private final FutureCallback<HttpResponse> futureCallback;
 
-    public CustomFutureCallBack(AtomicInteger unCompletedTaskNum, FutureCallback<HttpResponse> futureCallback) {
+    public GracefulCloseFutureCallBack(AtomicInteger unCompletedTaskNum, FutureCallback<HttpResponse> futureCallback) {
         super();
         this.unCompletedTaskNum = unCompletedTaskNum;
         this.futureCallback = futureCallback;

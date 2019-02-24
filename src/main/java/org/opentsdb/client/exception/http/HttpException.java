@@ -3,9 +3,6 @@ package org.opentsdb.client.exception.http;
 import lombok.Data;
 import org.opentsdb.client.bean.response.ErrorResponse;
 
-import java.text.MessageFormat;
-import java.util.Objects;
-
 /**
  * @Description:
  * @Author: jinyao
@@ -15,21 +12,11 @@ import java.util.Objects;
 @Data
 public class HttpException extends RuntimeException {
 
-    private ErrorResponse.Error error;
+    private ErrorResponse errorResponse;
 
     public HttpException(ErrorResponse errorResponse) {
-        super();
-        ErrorResponse.Error error = errorResponse.getError();
-        Objects.requireNonNull(error);
-        this.error = error;
+        super(errorResponse.toString());
+        this.errorResponse = errorResponse;
     }
 
-    @Override
-    public String toString() {
-        return MessageFormat.format(
-                "调用OpenTSDB http api发生错误，响应码:{0},错误信息:{1}",
-                error.getCode(),
-                error.getMessage()
-        );
-    }
 }

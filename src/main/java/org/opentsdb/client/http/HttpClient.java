@@ -8,7 +8,7 @@ import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.opentsdb.client.OpenTSDBConfig;
-import org.opentsdb.client.http.callback.CustomFutureCallBack;
+import org.opentsdb.client.http.callback.GracefulCloseFutureCallBack;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -80,13 +80,11 @@ public class HttpClient {
         FutureCallback<HttpResponse> responseCallback = null;
         if (httpCallback != null) {
             log.debug("等待完成的任务数:{}", unCompletedTaskNum.incrementAndGet());
-            responseCallback = new CustomFutureCallBack(unCompletedTaskNum, httpCallback);
+            responseCallback = new GracefulCloseFutureCallBack(unCompletedTaskNum, httpCallback);
         }
 
         return client.execute(httpPost, responseCallback);
     }
-
-
 
     private String getUrl(String path) {
         return host + ":" + port + path;

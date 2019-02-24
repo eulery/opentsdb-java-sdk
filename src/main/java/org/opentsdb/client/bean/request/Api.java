@@ -14,6 +14,7 @@ public enum Api {
      * path对应api地址
      */
     PUT("/api/put"),
+    PUT_DETAIL("/api/put?details=true"),
     QUERY("/api/query"),
     LAST("/api/query/last");
 
