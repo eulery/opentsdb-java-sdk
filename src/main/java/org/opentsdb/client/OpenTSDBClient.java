@@ -21,6 +21,7 @@ import org.opentsdb.client.sender.producer.ProducerImpl;
 import org.opentsdb.client.util.ResponseUtil;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -43,6 +44,11 @@ public class OpenTSDBClient {
 
     private BlockingQueue<Point> queue;
 
+    /***
+     * 通过反射来允许删除
+     */
+    private static Field queryDeleteField;
+
     public OpenTSDBClient(OpenTSDBConfig config) throws IOReactorException {
         this.config = config;
         this.httpClient = HttpClientFactory.createHttpClient(config);
@@ -53,6 +59,13 @@ public class OpenTSDBClient {
             this.producer = new ProducerImpl(queue);
             this.consumer = new ConsumerImpl(queue, httpClient, config);
             this.consumer.start();
+
+            try {
+                queryDeleteField = Query.class.getDeclaredField("delete");
+                queryDeleteField.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
         }
 
         log.debug("the httpclient has started");
@@ -97,7 +110,25 @@ public class OpenTSDBClient {
      * @param point
      */
     public void put(Point point) {
+        if (config.isReadonly()) {
+            throw new IllegalArgumentException("this client is readonly,can't put point");
+        }
         producer.send(point);
+    }
+
+    /***
+     * 删除数据，返回删除的数据
+     * @param query
+     */
+    public List<QueryResult> delete(Query query) throws IllegalAccessException, ExecutionException, InterruptedException, IOException {
+        if (config.isReadonly()) {
+            throw new IllegalArgumentException("this client is readonly,can't delete data");
+        }
+        queryDeleteField.set(query, true);
+        Future<HttpResponse> future = httpClient.post(Api.QUERY.getPath(), Json.writeValueAsString(query));
+        HttpResponse response = future.get();
+        List<QueryResult> results = Json.readValue(ResponseUtil.getContent(response), List.class, QueryResult.class);
+        return results;
     }
 
     /***

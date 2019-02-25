@@ -85,8 +85,6 @@ public class Query {
 
         private Boolean useCalendar;
 
-        private Boolean delete;
-
         private List<SubQuery> queries = new ArrayList<>();
 
         public Query build() {
@@ -121,7 +119,6 @@ public class Query {
             query.showQuery = this.showQuery;
             query.timezone = this.timezone;
             query.useCalendar = this.useCalendar;
-            query.delete = this.delete;
             return query;
         }
 
@@ -190,11 +187,6 @@ public class Query {
             return this;
         }
 
-        public Builder delete() {
-            this.delete = true;
-            return this;
-        }
-
         public Builder sub(SubQuery subQuery) {
             queries.add(subQuery);
             return this;
@@ -217,5 +209,11 @@ public class Query {
         return new Builder().begin(start);
     }
 
-
+    /***
+     * 设置私有，不允许用户设置delete属性，会在client中通过反射来设置
+     * @param delete
+     */
+    private void setDelete(Boolean delete) {
+        this.delete = delete;
+    }
 }
