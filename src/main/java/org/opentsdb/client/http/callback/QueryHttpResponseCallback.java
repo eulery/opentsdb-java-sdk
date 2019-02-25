@@ -38,10 +38,13 @@ public class QueryHttpResponseCallback implements FutureCallback<HttpResponse> {
             List<QueryResult> results = Json.readValue(ResponseUtil.getContent(response), List.class, QueryResult.class);
             log.debug("请求成功");
             this.callback.response(query, results);
-        } catch (IOException | HttpException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            log.error("请求失败，query:{},error:{}", query, e.getMessage());
             this.callback.failed(query, e);
+        } catch (HttpException e) {
+            log.error("请求失败，query:{},error:{}", query, e.getMessage());
+            e.printStackTrace();
+            this.callback.responseError(query, e);
         }
     }
 
@@ -67,6 +70,13 @@ public class QueryHttpResponseCallback implements FutureCallback<HttpResponse> {
          * @param queryResults
          */
         void response(Query query, List<QueryResult> queryResults);
+
+        /***
+         * 在response code失败时回调
+         * @param query
+         * @param e
+         */
+        void responseError(Query query, HttpException e);
 
         /***
          * 在发生错误是回调，如果http成功complete，但response code大于400，也会调用这个方法

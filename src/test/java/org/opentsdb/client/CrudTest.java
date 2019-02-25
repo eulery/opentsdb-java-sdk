@@ -9,6 +9,7 @@ import org.opentsdb.client.bean.request.*;
 import org.opentsdb.client.bean.response.DetailResult;
 import org.opentsdb.client.bean.response.LastPointQueryResult;
 import org.opentsdb.client.bean.response.QueryResult;
+import org.opentsdb.client.exception.http.HttpException;
 import org.opentsdb.client.http.callback.BatchPutHttpResponseCallback;
 import org.opentsdb.client.http.callback.QueryHttpResponseCallback;
 
@@ -24,7 +25,7 @@ import java.util.concurrent.*;
  * @Version: 1.0
  */
 @Slf4j
-public class CurdTest {
+public class CrudTest {
 
     String host = "http://127.0.0.1";
 
@@ -36,6 +37,37 @@ public class CurdTest {
     public void config() throws IOReactorException {
         OpenTSDBConfig config = OpenTSDBConfig.address(host, port)
                                               .config();
+        OpenTSDBConfig.address(host, port)
+                      // http连接池大小，默认100
+                      .httpConnectionPool(100)
+                      // http请求超时时间，默认100s
+                      .httpConnectTimeout(100)
+                      // 异步写入数据时，每次http提交的数据条数，默认50
+                      .batchPutSize(50)
+                      // 异步写入数据中，内部有一个队列，默认队列大小20000
+                      .batchPutBufferSize(20000)
+                      // 异步写入等待时间，如果距离上一次请求超多300ms，且有数据，则直接提交
+                      .batchPutTimeLimit(300)
+                      // 当确认这个client只用于查询时设置，可不创建内部队列从而提高效率
+                      .readonly()
+                      // 每批数据提交完成后回调
+                      .batchPutCallBack(new BatchPutHttpResponseCallback.BatchPutCallBack() {
+                          @Override
+                          public void response(List<Point> points, DetailResult result) {
+                              // 在请求完成并且response code成功时回调
+                          }
+
+                          @Override
+                          public void responseError(List<Point> points, DetailResult result) {
+                              // 在response code失败时回调
+                          }
+
+                          @Override
+                          public void failed(List<Point> points, Exception e) {
+                              // 在发生错误是回调
+                          }
+                      })
+                      .config();
         client = OpenTSDBClientFactory.connect(config);
     }
 
@@ -52,6 +84,22 @@ public class CurdTest {
                                         .build())
                            .build();
         List<QueryResult> resultList = client.query(query);
+        client.query(query, new QueryHttpResponseCallback.QueryCallback() {
+            @Override
+            public void response(Query query, List<QueryResult> queryResults) {
+                // 在请求完成并且response code成功时回调
+            }
+
+            @Override
+            public void responseError(Query query, HttpException e) {
+                // 在response code失败时回调
+            }
+
+            @Override
+            public void failed(Query query, Exception e) {
+                // 在发生错误是回调
+            }
+        });
         log.debug("result:{}", resultList);
     }
 
@@ -232,6 +280,9 @@ public class CurdTest {
         LastPointQuery query = LastPointQuery.sub(LastPointSubQuery.metric("point")
                                                                    .tag("testTag", "test_1")
                                                                    .build())
+                                             // baskScan表示查询最多向前推进多少小时
+                                             // 比如在5小时前写入过数据
+                                             // 那么backScan(6)可以查出数据，但backScan(4)则不行
                                              .backScan(1000)
                                              .build();
         List<LastPointQueryResult> lastPointQueryResults = client.queryLast(query);
@@ -252,9 +303,14 @@ public class CurdTest {
             }
 
             @Override
-            public void failed(Query query, Exception e) {
+            public void responseError(Query query, HttpException e) {
                 log.debug("fail,error:{}", e.getMessage());
+                e.printStackTrace();
                 ints[0] = 1;
+            }
+
+            @Override
+            public void failed(Query query, Exception e) {
                 e.printStackTrace();
             }
         };
