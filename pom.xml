@@ -9,7 +9,7 @@
     <version>0.1-SNAPSHOT</version>
 
     <properties>
-        <jacksonVersion>2.9.5</jacksonVersion>
+        <jacksonVersion>2.9.8</jacksonVersion>
     </properties>
 
     <dependencies>
