@@ -51,7 +51,7 @@ public class Json {
 
     /***
      * 将对象序列化为json字符串
-     * @param value
+     * @param value 具体对象
      * @return
      * @throws JsonProcessingException
      */
@@ -61,8 +61,8 @@ public class Json {
 
     /***
      * 将json字符串反序列化为T类型的对象
-     * @param content
-     * @param valueType
+     * @param content json字符串
+     * @param valueType 数据类型
      * @param <T>
      * @return
      * @throws IOException
@@ -73,7 +73,7 @@ public class Json {
 
     /***
      * 将json反序列化为集合，集合类型是collectionClass，泛型是elementClass
-     * @param content
+     * @param content json字符串
      * @param collectionClass 集合类型
      * @param elementClass  泛型
      */

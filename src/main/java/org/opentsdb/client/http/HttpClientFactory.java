@@ -34,7 +34,7 @@ public class HttpClientFactory {
 
     /***
      * 创建httpclient
-     * @param config
+     * @param config 配置文件
      * @return
      * @throws IOReactorException
      */
@@ -82,8 +82,8 @@ public class HttpClientFactory {
 
     /***
      * 创建client
-     * @param config
-     * @param cm
+     * @param config 查询对象
+     * @param cm 连接池管理
      * @return
      */
     private static CloseableHttpAsyncClient createPoolingHttpClient(RequestConfig config,
@@ -101,7 +101,7 @@ public class HttpClientFactory {
 
     /***
      * 创建定时任务线程池
-     * @param cm
+     * @param cm 连接池管理
      * @return
      */
     private static ScheduledExecutorService initFixedCycleCloseConnection(final PoolingNHttpClientConnectionManager cm) {

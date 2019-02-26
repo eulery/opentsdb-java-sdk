@@ -14,7 +14,7 @@ public interface Producer {
 
     /***
      * 写入队列
-     * @param point
+     * @param point 数据点
      */
     void send(Point point);
 

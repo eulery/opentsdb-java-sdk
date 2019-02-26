@@ -73,7 +73,7 @@ public class OpenTSDBClient {
 
     /***
      * 查询数据
-     * @param query
+     * @param query 查询对象
      * @return
      */
     public List<QueryResult> query(Query query) throws IOException, ExecutionException, InterruptedException {
@@ -85,8 +85,8 @@ public class OpenTSDBClient {
 
     /***
      * 异步查询
-     * @param query
-     * @param callback
+     * @param query 查询对象
+     * @param callback 回调
      */
     public void query(Query query, QueryHttpResponseCallback.QueryCallback callback) throws JsonProcessingException {
         QueryHttpResponseCallback queryHttpResponseCallback = new QueryHttpResponseCallback(callback, query);
@@ -95,7 +95,7 @@ public class OpenTSDBClient {
 
     /***
      * 查询最新的数据
-     * @param query
+     * @param query 查询对象
      * @return
      */
     public List<LastPointQueryResult> queryLast(LastPointQuery query) throws IOException, ExecutionException, InterruptedException {
@@ -107,7 +107,7 @@ public class OpenTSDBClient {
 
     /***
      * 写入数据
-     * @param point
+     * @param point 数据点
      */
     public void put(Point point) {
         if (config.isReadonly()) {
@@ -118,7 +118,7 @@ public class OpenTSDBClient {
 
     /***
      * 删除数据，返回删除的数据
-     * @param query
+     * @param query 查询对象
      */
     public List<QueryResult> delete(Query query) throws IllegalAccessException, ExecutionException, InterruptedException, IOException {
         if (config.isReadonly()) {

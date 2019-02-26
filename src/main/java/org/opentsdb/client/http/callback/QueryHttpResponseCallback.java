@@ -66,22 +66,22 @@ public class QueryHttpResponseCallback implements FutureCallback<HttpResponse> {
 
         /***
          * 在请求完成并且response code成功时回调
-         * @param query
-         * @param queryResults
+         * @param query 查询对象
+         * @param queryResults 查询结果
          */
         void response(Query query, List<QueryResult> queryResults);
 
         /***
          * 在response code失败时回调
-         * @param query
-         * @param e
+         * @param query 查询对象
+         * @param e 异常
          */
         void responseError(Query query, HttpException e);
 
         /***
          * 在发生错误是回调，如果http成功complete，但response code大于400，也会调用这个方法
-         * @param query
-         * @param e
+         * @param query 查询对象
+         * @param e 异常
          */
         void failed(Query query, Exception e);
 

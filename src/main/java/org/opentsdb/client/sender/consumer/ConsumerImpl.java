@@ -65,7 +65,7 @@ public class ConsumerImpl implements Consumer {
 
     /***
      * 关闭线程池
-     * @param force
+     * @param force 是否强制关闭
      */
     private void stop(boolean force) {
         if (threadPool != null) {

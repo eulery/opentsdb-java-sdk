@@ -23,7 +23,7 @@ public class ResponseUtil {
 
     /***
      * 解析响应的内容
-     * @param response
+     * @param response 响应内容
      * @return
      * @throws IOException
      */
@@ -45,7 +45,7 @@ public class ResponseUtil {
 
     /***
      * 判断响应码的是否为400以上，如果是，则表示出错了
-     * @param response
+     * @param response  查询对象
      * @return
      */
     private static boolean checkGT400(HttpResponse response) {
@@ -59,7 +59,7 @@ public class ResponseUtil {
 
     /***
      * 将响应内容转换成errorResponse
-     * @param response
+     * @param response  查询对象
      * @return
      */
     private static ErrorResponse convert(HttpResponse response) throws IOException {

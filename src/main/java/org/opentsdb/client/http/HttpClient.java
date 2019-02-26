@@ -54,8 +54,8 @@ public class HttpClient {
 
     /***
      * post请求
-     * @param path
-     * @param json
+     * @param path 请求路径
+     * @param json json格式参数
      * @return
      */
     public Future<HttpResponse> post(String path, String json) {
@@ -64,9 +64,9 @@ public class HttpClient {
 
     /***
      * post请求
-     * @param path
+     * @param path 请求路径
      * @param json 请求内容，json格式z
-     * @param httpCallback
+     * @param httpCallback 回调
      * @return
      */
     public Future<HttpResponse> post(String path, String json, FutureCallback<HttpResponse> httpCallback) {

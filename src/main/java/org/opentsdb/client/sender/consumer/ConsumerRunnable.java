@@ -118,7 +118,7 @@ public class ConsumerRunnable implements Runnable {
 
     /***
      * 发送请求写入数据
-     * @param points
+     * @param points 数据点
      */
     private void sendHttp(List<Point> points) {
         try {

@@ -76,22 +76,22 @@ public class BatchPutHttpResponseCallback implements FutureCallback<HttpResponse
 
         /***
          * 在请求完成并且response code成功时回调
-         * @param points
-         * @param result
+         * @param points 数据点
+         * @param result 请求结果
          */
         void response(List<Point> points, DetailResult result);
 
         /***
          * 在response code失败时回调
-         * @param points
-         * @param result
+         * @param points 数据点
+         * @param result 请求结果
          */
         void responseError(List<Point> points, DetailResult result);
 
         /***
          * 在发生错误是回调
-         * @param points
-         * @param e
+         * @param points 数据点
+         * @param e 异常
          */
         void failed(List<Point> points, Exception e);
 
