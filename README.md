@@ -11,7 +11,13 @@
 
 # 快速开始
 ## Maven依赖
-TODO
+```xml
+<dependency>
+    <groupId>com.github.eulery</groupId>
+    <artifactId>opentsdb-java-sdk</artifactId>
+    <version>1.0</version>
+</dependency>
+```
 ## 创建连接
 ```java
 OpenTSDBConfig config = OpenTSDBConfig.address(host, port)
