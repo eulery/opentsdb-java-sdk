@@ -23,6 +23,9 @@
 OpenTSDBConfig config = OpenTSDBConfig.address(host, port)
                                               .config();
 OpenTSDBClient client = OpenTSDBClientFactory.connect(config);
+
+// 优雅关闭连接，会等待所有异步操作完成
+client.gracefulClose();
 ```
 ```java
 OpenTSDBConfig.address(host, port)
