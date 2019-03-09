@@ -16,7 +16,8 @@ public enum Api {
     PUT("/api/put"),
     PUT_DETAIL("/api/put?details=true"),
     QUERY("/api/query"),
-    LAST("/api/query/last");
+    LAST("/api/query/last"),
+    SUGGEST("/api/suggest");
 
     private String path;
 

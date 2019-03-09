@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.nio.reactor.IOReactorException;
-import org.opentsdb.client.bean.request.Api;
-import org.opentsdb.client.bean.request.LastPointQuery;
-import org.opentsdb.client.bean.request.Point;
-import org.opentsdb.client.bean.request.Query;
+import org.opentsdb.client.bean.request.*;
 import org.opentsdb.client.bean.response.LastPointQueryResult;
 import org.opentsdb.client.bean.response.QueryResult;
 import org.opentsdb.client.common.Json;
@@ -128,6 +125,18 @@ public class OpenTSDBClient {
         Future<HttpResponse> future = httpClient.post(Api.QUERY.getPath(), Json.writeValueAsString(query));
         HttpResponse response = future.get();
         List<QueryResult> results = Json.readValue(ResponseUtil.getContent(response), List.class, QueryResult.class);
+        return results;
+    }
+
+    /***
+     * 查询metric、tag_key、tag_value的信息
+     * @param query
+     * @return
+     */
+    public List<String> querySuggest(SuggestQuery query) throws ExecutionException, InterruptedException, IOException {
+        Future<HttpResponse> future = httpClient.post(Api.SUGGEST.getPath(), Json.writeValueAsString(query));
+        HttpResponse response = future.get();
+        List<String> results = Json.readValue(ResponseUtil.getContent(response), List.class, String.class);
         return results;
     }
 
