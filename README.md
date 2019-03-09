@@ -6,6 +6,7 @@
 * 写入数据，支持异步回调
 * 删除数据
 * 查询最新数据
+* 查询metric、tag_key和tag_value，支持auto_complete
 <br>
 `源码中CrudTest类提供了一些使用说明和测试，包括并发查询测试和并发写入测试`
 
@@ -15,7 +16,7 @@
 <dependency>
     <groupId>com.github.eulery</groupId>
     <artifactId>opentsdb-java-sdk</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 ## 创建连接
@@ -122,3 +123,22 @@ Query query = Query.begin("7d-ago")
                    .build();
 client.delete(query);
 ```
+## 查询metrics、tagk、tagv
+具体参数使用说明查看[http api](http://opentsdb.net/docs/build/html/api_http/suggest.html)
+```java
+SuggestQuery query = SuggestQuery.type(SuggestQuery.Type.METRICS)
+                                 .build();
+List<String> suggests = client.querySuggest(query);
+```
+
+## ttl
+如果想为数据设置ttl(time to live)，opentsdb没有直接提供这方面的api，只能通过底层hbase的ttl来完成‘’
+‘’'shell
+hbase> describe 'tsdb'
+
+Table tsdb is ENABLED
+tsdb, {NAME => 't', VERSIONS => 1, COMPRESSION => 'NONE', TTL => 'FOREVER'}
+
+hbase> alter ‘tsdb′, NAME => ‘t′, TTL => 8640000
+'''
+
