@@ -133,12 +133,11 @@ List<String> suggests = client.querySuggest(query);
 
 ## ttl
 如果想为数据设置ttl(time to live)，opentsdb没有直接提供这方面的api，只能通过底层hbase的ttl来完成‘’
-‘’'shell
+```shell
 hbase> describe 'tsdb'
-
 Table tsdb is ENABLED
 tsdb, {NAME => 't', VERSIONS => 1, COMPRESSION => 'NONE', TTL => 'FOREVER'}
 
 hbase> alter ‘tsdb′, NAME => ‘t′, TTL => 8640000
-'''
+```
 
