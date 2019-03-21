@@ -2,16 +2,21 @@ package org.opentsdb.client.http;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.ConnectionReuseStrategy;
+import org.apache.http.HeaderElement;
+import org.apache.http.HeaderElementIterator;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
+import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.opentsdb.client.OpenTSDBConfig;
 
@@ -45,7 +50,7 @@ public class HttpClientFactory {
         PoolingNHttpClientConnectionManager connManager = new PoolingNHttpClientConnectionManager(ioReactor);
 
         RequestConfig requestConfig = initRequestConfig(config);
-        CloseableHttpAsyncClient httpAsyncClient = createPoolingHttpClient(requestConfig, connManager);
+        CloseableHttpAsyncClient httpAsyncClient = createPoolingHttpClient(requestConfig, connManager, config);
 
         return new HttpClient(config, httpAsyncClient, initFixedCycleCloseConnection(connManager));
     }
@@ -80,22 +85,48 @@ public class HttpClientFactory {
                             .build();
     }
 
+    private static ConnectionKeepAliveStrategy myStrategy() {
+        ConnectionKeepAliveStrategy myStrategy = new ConnectionKeepAliveStrategy() {
+            @Override
+            public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
+                HeaderElementIterator it = new BasicHeaderElementIterator
+                        (response.headerIterator(HTTP.CONN_KEEP_ALIVE));
+                while (it.hasNext()) {
+                    HeaderElement he = it.nextElement();
+                    String param = he.getName();
+                    String value = he.getValue();
+                    if (value != null && param.equalsIgnoreCase
+                            ("timeout")) {
+                        return Long.parseLong(value) * 1000;
+                    }
+                }
+                return 60 * 1000;//如果没有约定，则默认定义时长为60s
+            }
+        };
+        return myStrategy;
+    }
+
     /***
      * 创建client
      * @param config 查询对象
      * @param cm 连接池管理
+     * @param openTSDBConfig
      * @return
      */
     private static CloseableHttpAsyncClient createPoolingHttpClient(RequestConfig config,
-                                                                    PoolingNHttpClientConnectionManager cm) {
+                                                                    PoolingNHttpClientConnectionManager cm,
+                                                                    OpenTSDBConfig openTSDBConfig) {
         cm.setMaxTotal(100);
         cm.setDefaultMaxPerRoute(100);
 
-        CloseableHttpAsyncClient client = HttpAsyncClients.custom()
-                                                          .setConnectionManager(cm)
-                                                          .setDefaultRequestConfig(config)
-                                                          .setConnectionReuseStrategy(new OpenTSDBConnectionReuseStrategy())
-                                                          .build();
+        HttpAsyncClientBuilder httpAsyncClientBuilder = HttpAsyncClients.custom()
+                                                                        .setConnectionManager(cm)
+                                                                        .setDefaultRequestConfig(config);
+        // 如果不是只读，则设置为长连接
+        if (!openTSDBConfig.isReadonly()) {
+            httpAsyncClientBuilder.setKeepAliveStrategy(myStrategy());
+        }
+        CloseableHttpAsyncClient client = httpAsyncClientBuilder.build();
         return client;
     }
 

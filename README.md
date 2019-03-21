@@ -16,7 +16,7 @@
 <dependency>
     <groupId>com.github.eulery</groupId>
     <artifactId>opentsdb-java-sdk</artifactId>
-    <version>1.1</version>
+    <version>1.1.3</version>
 </dependency>
 ```
 ## 创建连接
