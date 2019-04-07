@@ -18,13 +18,6 @@ import java.util.List;
 @Data
 public class Query {
 
-    /***
-     * 时间戳，秒或者毫秒
-     */
-    private Long startTimestamp;
-
-    private Long endTimestamp;
-
     /**
      * 形如1h-ago
      */
@@ -101,13 +94,13 @@ public class Query {
             if (StringUtils.isNoneBlank(start)) {
                 query.start = this.start;
             } else if (this.startTimestamp != null) {
-                query.startTimestamp = this.startTimestamp;
+                query.start = this.startTimestamp.toString();
             }
 
             if (StringUtils.isNoneBlank(end)) {
                 query.end = this.end;
             } else if (this.endTimestamp != null) {
-                query.endTimestamp = this.endTimestamp;
+                query.end = this.endTimestamp.toString();
             }
 
             query.msResolution = this.msResolution;
