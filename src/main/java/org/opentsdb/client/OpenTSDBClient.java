@@ -1,6 +1,7 @@
 package org.opentsdb.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.nio.reactor.IOReactorException;
@@ -10,6 +11,7 @@ import org.opentsdb.client.bean.response.QueryResult;
 import org.opentsdb.client.common.Json;
 import org.opentsdb.client.http.HttpClient;
 import org.opentsdb.client.http.HttpClientFactory;
+import org.opentsdb.client.http.callback.BatchPutHttpResponseCallback;
 import org.opentsdb.client.http.callback.QueryHttpResponseCallback;
 import org.opentsdb.client.sender.consumer.Consumer;
 import org.opentsdb.client.sender.consumer.ConsumerImpl;
@@ -111,6 +113,79 @@ public class OpenTSDBClient {
             throw new IllegalArgumentException("this client is readonly,can't put point");
         }
         producer.send(point);
+    }
+
+    /***
+     * 同步写入
+     * @param point
+     */
+    public void putSync(Point point) throws IOException, ExecutionException, InterruptedException {
+        this.putSync(Lists.newArrayList(point));
+    }
+
+    /***
+     * 同步写入
+     * @param points
+     */
+    public void putSync(List<Point> points) throws IOException, ExecutionException, InterruptedException {
+        Future<HttpResponse> future = httpClient.post(
+                Api.PUT.getPath(),
+                Json.writeValueAsString(points),
+                new BatchPutHttpResponseCallback()
+        );
+        HttpResponse httpResponse = future.get();
+        ResponseUtil.getContent(httpResponse);
+    }
+
+    /***
+     * 同步写入,将会使用创建opentsdbClient时默认的callback
+     * @param point
+     */
+    public void putSyncWithCallBack(Point point) throws IOException, ExecutionException, InterruptedException {
+        this.putSyncWithCallBack(Lists.newArrayList(point));
+    }
+
+    /***
+     * 同步写入,将会使用创建opentsdbClient时默认的callback
+     * @param points
+     */
+    public void putSyncWithCallBack(List<Point> points) throws IOException, ExecutionException, InterruptedException {
+        Future<HttpResponse> future = httpClient.post(
+                Api.PUT.getPath(),
+                Json.writeValueAsString(points),
+                new BatchPutHttpResponseCallback(config.getBatchPutCallBack(), points)
+        );
+        HttpResponse httpResponse = future.get();
+        ResponseUtil.getContent(httpResponse);
+    }
+
+    /***
+     * 同步写入,使用自定义的callback
+     * @param point
+     */
+    public void putSyncWithCallBack(Point point, BatchPutHttpResponseCallback.BatchPutCallBack callBack) throws
+            JsonProcessingException {
+        this.putSyncWithCallBack(Lists.newArrayList(point), callBack);
+    }
+
+    /***
+     * 同步写入,使用自定义的callback
+     * @param points
+     */
+    public void putSyncWithCallBack(List<Point> points, BatchPutHttpResponseCallback.BatchPutCallBack callBack) throws JsonProcessingException {
+        httpClient.post(
+                Api.PUT.getPath(),
+                Json.writeValueAsString(points),
+                new BatchPutHttpResponseCallback(callBack, points)
+        );
+    }
+
+    /***
+     * 同步写入
+     * @param point
+     */
+    public void putSync(Point point, BatchPutHttpResponseCallback.BatchPutCallBack callBack) throws IOException, ExecutionException, InterruptedException {
+        this.putSync(Lists.newArrayList(point));
     }
 
     /***

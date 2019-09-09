@@ -173,7 +173,8 @@ public class CrudTest {
                            .tag("test", "hello")
                            .value(System.currentTimeMillis(), 1.0)
                            .build();
-        client.put(point);
+        //client.put(point);
+        client.putSync(point);
         client.gracefulClose();
     }
 

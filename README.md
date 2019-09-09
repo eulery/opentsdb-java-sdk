@@ -16,7 +16,7 @@
 <dependency>
     <groupId>com.github.eulery</groupId>
     <artifactId>opentsdb-java-sdk</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.6</version>
 </dependency>
 ```
 ## 创建连接
@@ -132,7 +132,7 @@ List<String> suggests = client.querySuggest(query);
 ```
 
 ## ttl
-如果想为数据设置ttl(time to live)，opentsdb没有直接提供这方面的api，只能通过底层hbase的ttl来完成‘’
+如果想为数据设置ttl(time to live)，opentsdb没有直接提供这方面的api，只能通过底层hbase的ttl来完成
 ```shell
 hbase> describe 'tsdb'
 Table tsdb is ENABLED
