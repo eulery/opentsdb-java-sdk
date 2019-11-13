@@ -14,7 +14,7 @@
     <url>https://github.com/eulery/opentsdb-java-sdk</url>
 
     <properties>
-        <jacksonVersion>2.9.8</jacksonVersion>
+        <jacksonVersion>2.10.1</jacksonVersion>
     </properties>
 
     <dependencies>
